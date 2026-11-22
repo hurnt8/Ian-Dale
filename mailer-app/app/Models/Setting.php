@@ -19,6 +19,8 @@ class Setting extends Model
         'max_recipients' => '500',  // taille max d'une liste soumise
         'skip_invalid' => '1',      // ne pas envoyer aux adresses dont la vérification échoue
         'skip_typo' => '0',         // ne pas envoyer aux adresses suspectes (faute de frappe)
+        'orange_only' => '1',       // n'envoyer qu'aux destinataires Orange
+        'orange_domains' => 'orange.fr, wanadoo.fr', // domaines considérés comme Orange
         'mail_from_name' => null,   // nom d'expéditeur (défaut : nom de l'application)
         'mail_reply_to' => null,    // adresse de réponse
 

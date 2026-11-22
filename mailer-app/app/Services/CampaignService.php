@@ -31,8 +31,9 @@ final class CampaignService
         $results = $this->verifier->verifyMany($emails);
         $skipInvalid = Setting::bool('skip_invalid');
         $skipTypo = Setting::bool('skip_typo');
+        $orangeOnly = \App\Support\OrangeDomains::enforced();
 
-        $campaign = DB::transaction(function () use ($propet, $template, $title, $emails, $results, $skipInvalid, $skipTypo): Campaign {
+        $campaign = DB::transaction(function () use ($propet, $template, $title, $emails, $results, $skipInvalid, $skipTypo, $orangeOnly): Campaign {
             $campaign = Campaign::create([
                 'user_id' => $propet->id,
                 'message_template_id' => $template->id,
@@ -51,9 +52,12 @@ final class CampaignService
             $unsubscribed = Unsubscribe::query()->whereIn('email', $emails)->pluck('email')->flip();
             $now = now();
 
-            $rows = array_map(function ($r) use ($campaign, $unsubscribed, $now, $skipInvalid, $skipTypo) {
+            $rows = array_map(function ($r) use ($campaign, $unsubscribed, $now, $skipInvalid, $skipTypo, $orangeOnly) {
+                $nonOrange = $orangeOnly && ! \App\Support\OrangeDomains::allows($r->email);
+
                 $status = match (true) {
                     isset($unsubscribed[$r->email]) => RecipientStatus::Skipped,
+                    $nonOrange => RecipientStatus::Skipped,
                     $skipInvalid && $r->status->isBlocking() => RecipientStatus::Invalid,
                     $skipTypo && $r->status === VerificationStatus::Typo => RecipientStatus::Invalid,
                     default => RecipientStatus::Pending,
@@ -66,6 +70,7 @@ final class CampaignService
                     'status' => $status->value,
                     'verification' => $r->status->value,
                     'verification_detail' => mb_substr($r->detail, 0, 255),
+                    'error' => $nonOrange ? 'Hors Orange — non contactée' : null,
                     'created_at' => $now,
                     'updated_at' => $now,
                 ];

@@ -18,6 +18,8 @@ class SettingController extends Controller
             'requireApproval' => Setting::bool('require_approval'),
             'skipInvalid' => Setting::bool('skip_invalid'),
             'skipTypo' => Setting::bool('skip_typo'),
+            'orangeOnly' => Setting::bool('orange_only'),
+            'orangeDomains' => Setting::get('orange_domains'),
             'perMinute' => Setting::int('per_minute'),
             'maxRecipients' => Setting::int('max_recipients'),
             'fromName' => Setting::get('mail_from_name'),
@@ -35,9 +37,10 @@ class SettingController extends Controller
             'max_recipients' => ['required', 'integer', 'min:1', 'max:10000'],
             'mail_from_name' => ['nullable', 'string', 'max:100'],
             'mail_reply_to' => ['nullable', 'email', 'max:190'],
+            'orange_domains' => ['nullable', 'string', 'max:500'],
         ]);
 
-        foreach (['require_approval', 'skip_invalid', 'skip_typo'] as $flag) {
+        foreach (['require_approval', 'skip_invalid', 'skip_typo', 'orange_only'] as $flag) {
             Setting::put($flag, $request->boolean($flag) ? '1' : '0');
         }
         foreach ($data as $key => $value) {

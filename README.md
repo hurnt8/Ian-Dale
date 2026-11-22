@@ -50,7 +50,7 @@ Les pages publiques (formulaire d'avis, vues, connexion) partagent ce thème : v
 
 - **Admin > Messages** : plusieurs messages, chacun avec son logo (facultatif), un bouton d'action et l'option « Disponible pour les propets ». Le propet choisit le message au moment de soumettre sa liste, avec un aperçu exact.
 - **Admin > Présentation** : logo général (intégré à l'email en pièce jointe inline, pas de lien externe), couleurs, police, en-tête, pied de page, avec un aperçu en direct.
-- **Admin > Paramètres** : validation obligatoire ou non, écarter les adresses invalides et les fautes de frappe, débit par minute, taille max, nom d'expéditeur, adresse de réponse.
+- **Admin > Paramètres** : validation obligatoire ou non, écarter les adresses invalides et les fautes de frappe, **n'envoyer qu'aux destinataires Orange** (domaines paramétrables, par défaut `orange.fr, wanadoo.fr` ; les autres sont marquées « Ignoré / Hors Orange » et ne reçoivent rien), débit par minute, taille max, nom d'expéditeur, adresse de réponse.
 
 ## Démarrage (XAMPP / Windows)
 

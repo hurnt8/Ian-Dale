@@ -45,6 +45,22 @@
             </div>
 
             <div class="card mb-4">
+                <div class="card-header"><span><i class="bi bi-funnel me-2"></i>Destinataires autorisés</span></div>
+                <div class="card-body">
+                    <div class="form-check form-switch mb-3">
+                        <input type="checkbox" name="orange_only" value="1" class="form-check-input" id="oo" @checked($orangeOnly)>
+                        <label class="form-check-label" for="oo">
+                            <span class="fw-semibold">Envoyer uniquement aux destinataires Orange</span>
+                            <div class="form-text mt-0">Les adresses hors Orange sont écartées (statut « Ignoré », motif « Hors Orange ») et ne reçoivent rien.</div>
+                        </label>
+                    </div>
+                    <label class="form-label">Domaines considérés comme Orange</label>
+                    <input name="orange_domains" value="{{ old('orange_domains', $orangeDomains) }}" maxlength="500" class="form-control" placeholder="orange.fr, wanadoo.fr">
+                    <div class="form-text">Séparés par des virgules. Laissez vide pour revenir à <code>orange.fr, wanadoo.fr</code>.</div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
                 <div class="card-header"><span><i class="bi bi-speedometer2 me-2"></i>Débit et limites</span></div>
                 <div class="card-body">
                     <div class="row g-3">

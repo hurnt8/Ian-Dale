@@ -8,7 +8,7 @@ use App\Services\Verification\DomainResolver;
 class FakeDomainResolver extends DomainResolver
 {
     /** Domaines avec serveur mail */
-    public array $mx = ['example.fr', 'example.com', 'example.org', 'gmail.com', 'orange.fr', 'e.fr'];
+    public array $mx = ['example.fr', 'example.com', 'example.org', 'gmail.com', 'orange.fr', 'wanadoo.fr', 'e.fr'];
 
     /** Domaines existants sans MX */
     public array $a = ['site-sans-mail.fr'];
