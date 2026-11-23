@@ -33,6 +33,8 @@ final class MailBranding
             'logo_path' => Setting::get('mail_logo_path'),
             'logo_width' => (int) Setting::get('mail_logo_width'),
             'logo_align' => Setting::get('mail_logo_align'),
+            'logo_label' => Setting::get('mail_logo_label'),      // texte à côté du logo (ex. : « Le service clients »)
+            'info_lines' => self::infoLines(Setting::get('mail_info_lines')), // bloc d'infos à libellés
             'primary' => Setting::get('mail_primary_color'),
             'bg' => Setting::get('mail_bg_color'),
             'card' => Setting::get('mail_card_color'),
@@ -43,7 +45,7 @@ final class MailBranding
         ];
 
         $map = [
-            'mail_logo_width' => 'logo_width', 'mail_logo_align' => 'logo_align',
+            'mail_logo_width' => 'logo_width', 'mail_logo_align' => 'logo_align', 'mail_logo_label' => 'logo_label',
             'mail_primary_color' => 'primary', 'mail_bg_color' => 'bg', 'mail_card_color' => 'card',
             'mail_text_color' => 'text', 'mail_font' => 'font', 'mail_header_text' => 'header', 'mail_footer_text' => 'footer',
         ];
@@ -65,12 +67,67 @@ final class MailBranding
             }
         }
 
+        // Bloc d'informations (aperçu en direct : transmis en JSON)
+        if (array_key_exists('mail_info_lines', $overrides)) {
+            $b['info_lines'] = self::infoLines(is_string($overrides['mail_info_lines']) ? $overrides['mail_info_lines'] : null);
+        }
+
         return $b;
     }
 
     public static function isColor(string $v): bool
     {
         return (bool) preg_match('/^#[0-9a-fA-F]{6}$/', $v);
+    }
+
+    /**
+     * Normalise le bloc d'informations (paires libellé/valeur) à afficher près du logo.
+     *
+     * @return list<array{label:string,value:string}>
+     */
+    public static function infoLines(?string $json): array
+    {
+        $rows = is_string($json) && $json !== '' ? json_decode($json, true) : null;
+        if (! is_array($rows)) {
+            return [];
+        }
+
+        $out = [];
+        foreach ($rows as $r) {
+            if (! is_array($r)) {
+                continue;
+            }
+            $label = mb_substr(trim((string) ($r['label'] ?? '')), 0, 60);
+            $value = mb_substr(trim((string) ($r['value'] ?? '')), 0, 200);
+            if ($label === '' && $value === '') {
+                continue;
+            }
+            $out[] = ['label' => $label, 'value' => $value];
+            if (count($out) >= 8) {
+                break;
+            }
+        }
+
+        return $out;
+    }
+
+    /** Encode des paires libellé/valeur en JSON stockable (ou null si vide). */
+    public static function encodeInfoLines(mixed $rows): ?string
+    {
+        if (! is_array($rows)) {
+            return null;
+        }
+
+        $clean = [];
+        foreach ($rows as $r) {
+            $label = is_array($r) ? trim((string) ($r['label'] ?? '')) : '';
+            $value = is_array($r) ? trim((string) ($r['value'] ?? '')) : '';
+            if ($label !== '' || $value !== '') {
+                $clean[] = ['label' => mb_substr($label, 0, 60), 'value' => mb_substr($value, 0, 200)];
+            }
+        }
+
+        return $clean === [] ? null : json_encode(array_slice($clean, 0, 8), JSON_UNESCAPED_UNICODE);
     }
 
     /** Chemin absolu d'un logo stocké, ou null s'il n'existe pas. */

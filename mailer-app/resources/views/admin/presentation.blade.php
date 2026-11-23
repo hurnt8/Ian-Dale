@@ -35,9 +35,35 @@
                                 @endforeach
                             </select>
                         </div>
+                        <div class="col-12">
+                            <label class="form-label">Texte à côté du logo <span class="text-secondary fw-normal">(facultatif)</span></label>
+                            <input name="mail_logo_label" value="{{ old('mail_logo_label', $b['logo_label']) }}" maxlength="100" class="form-control live" placeholder="Ex. : Le service clients">
+                            <div class="form-text">Affiché en gras à droite du logo, comme un nom d'expéditeur.</div>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <div class="card mb-4">
+                <div class="card-header"><span><i class="bi bi-list-columns-reverse me-2"></i>Informations à côté du logo</span></div>
+                <div class="card-body">
+                    <p class="small text-secondary mb-2">
+                        Lignes « libellé : valeur » affichées dans un bloc sous l'en-tête (ex. : <code>Votre numéro</code> → <code>06 66 …</code>).
+                        Variables : <code>{email}</code> <code>{date}</code> <code>{app}</code>.
+                    </p>
+                    <input type="hidden" name="mail_info_lines" id="info-json" class="live">
+                    <div id="info-rows" class="d-flex flex-column gap-2"></div>
+                    <button type="button" class="btn btn-light btn-sm mt-2" id="info-add"><i class="bi bi-plus-lg me-1"></i> Ajouter une ligne</button>
+                </div>
+            </div>
+
+            <template id="info-tpl">
+                <div class="info-row d-flex gap-2 align-items-center">
+                    <input data-n="label" class="form-control form-control-sm" placeholder="Libellé (ex. : Votre numéro)" maxlength="60" style="max-width:42%">
+                    <input data-n="value" class="form-control form-control-sm" placeholder="Valeur (ex. : 06 66 …)" maxlength="200">
+                    <button type="button" class="btn btn-light btn-icon btn-sm text-danger" data-act="del" title="Retirer"><i class="bi bi-x-lg"></i></button>
+                </div>
+            </template>
 
             <div class="card mb-4">
                 <div class="card-header"><span><i class="bi bi-palette me-2"></i>Couleurs et police</span></div>
@@ -130,6 +156,44 @@
     form.querySelectorAll('.live').forEach(el => el.addEventListener('input', refresh));
     sel.addEventListener('change', refresh);
     refresh();
+
+    // --- Bloc d'informations à libellés ---
+    const rows = document.getElementById('info-rows');
+    const tpl = document.getElementById('info-tpl');
+    const json = document.getElementById('info-json');
+    if (rows) {
+        const initial = @json(array_values($b['info_lines']));
+
+        const reindex = () => [...rows.children].forEach((r, i) =>
+            r.querySelectorAll('[data-n]').forEach(el => el.name = `info_lines[${i}][${el.dataset.n}]`));
+
+        const sync = () => {
+            const data = [...rows.children].map(r => ({
+                label: r.querySelector('[data-n="label"]').value,
+                value: r.querySelector('[data-n="value"]').value,
+            })).filter(l => l.label || l.value);
+            json.value = JSON.stringify(data);
+            json.dispatchEvent(new Event('input')); // met à jour l'aperçu
+        };
+
+        const add = (l = {}) => {
+            const row = tpl.content.firstElementChild.cloneNode(true);
+            row.querySelector('[data-n="label"]').value = l.label ?? '';
+            row.querySelector('[data-n="value"]').value = l.value ?? '';
+            rows.appendChild(row);
+            reindex();
+            return row;
+        };
+
+        rows.addEventListener('input', sync);
+        rows.addEventListener('click', e => {
+            if (e.target.closest('[data-act="del"]')) { e.target.closest('.info-row').remove(); reindex(); sync(); }
+        });
+        document.getElementById('info-add').addEventListener('click', () => add().querySelector('input').focus());
+
+        initial.forEach(add);
+        sync();
+    }
 })();
 </script>
 @endsection

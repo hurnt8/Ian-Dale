@@ -184,6 +184,46 @@ class VerificationAndBrandingTest extends TestCase
         $this->assertStringContainsString('#ff6600', $sent->getHtmlBody());
     }
 
+    public function test_logo_label_and_info_block_render_in_the_email(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $this->actingAs($admin)->put('/admin/presentation', [
+            'mail_logo_width' => 120, 'mail_logo_align' => 'left',
+            'mail_primary_color' => '#ff7900', 'mail_bg_color' => '#ffffff', 'mail_card_color' => '#ffffff', 'mail_text_color' => '#111111',
+            'mail_font' => 'Arial, Helvetica, sans-serif',
+            'mail_logo_label' => 'Le service clients',
+            'mail_header_text' => 'Vos services sont rétablis',
+            'info_lines' => [
+                ['label' => 'Votre adresse', 'value' => '{email}'],
+                ['label' => 'N° client', 'value' => '1630019247'],
+                ['label' => '', 'value' => ''], // ligne vide ignorée
+            ],
+        ])->assertSessionHasNoErrors();
+
+        $stored = json_decode(Setting::get('mail_info_lines'), true);
+        $this->assertCount(2, $stored);
+        $this->assertSame('Votre adresse', $stored[0]['label']);
+
+        // Aperçu : la variable {email} est résolue avec l'adresse de démonstration
+        $this->actingAs($admin)->get(route('preview.template', $this->main))->assertOk()
+            ->assertSee('Le service clients')->assertSee('Vos services sont rétablis')
+            ->assertSee('Votre adresse')->assertSee('1630019247')->assertSee('destinataire@exemple.fr');
+
+        // Envoi réel : {email} devient l'adresse du destinataire
+        $c = Campaign::create([
+            'user_id' => User::factory()->create()->id, 'message_template_id' => $this->main->id,
+            'title' => 't', 'subject' => 'Sujet', 'body' => 'Bonjour', 'status' => CampaignStatus::Sending, 'total' => 1,
+        ]);
+        Mail::to('lebre.christian@wanadoo.fr')->send(new CampaignMail($c, 'lebre.christian@wanadoo.fr'));
+
+        $html = app('mailer')->getSymfonyTransport()->messages()->last()->getOriginalMessage()->getHtmlBody();
+        $this->assertStringContainsString('Le service clients', $html);
+        $this->assertStringContainsString('Votre adresse', $html);
+        $this->assertStringContainsString('lebre.christian@wanadoo.fr', $html);
+        $this->assertStringContainsString('Vos services sont rétablis', $html);
+    }
+
     public function test_template_logo_overrides_global_logo_and_behaviour_settings_apply(): void
     {
         $admin = User::factory()->admin()->create();

@@ -79,6 +79,13 @@ class CampaignMail extends Mailable
         $branding = MailBranding::current($brandingOverrides);
         $hasForm = $form !== null && \App\Support\ResponseForm::isActive($form) && $formUrl;
 
+        // Les variables {email} {date} {app} sont résolues aussi dans le libellé du logo et le bloc d'infos.
+        $branding['logo_label'] = $branding['logo_label'] ? self::fill($branding['logo_label'], $email) : null;
+        $branding['info_lines'] = array_map(
+            fn ($l) => ['label' => $l['label'], 'value' => self::fill($l['value'], $email)],
+            $branding['info_lines'],
+        );
+
         return [
             'body' => self::fill($body, $email, $hasForm ? $formUrl : null),
             'formUrl' => $hasForm ? $formUrl : null,

@@ -32,6 +32,10 @@ class PresentationController extends Controller
             'logo' => ['nullable', 'image', 'mimes:png,jpg,jpeg,gif,webp', 'max:1024'],
             'mail_logo_width' => ['required', 'integer', 'min:40', 'max:600'],
             'mail_logo_align' => ['required', Rule::in(['left', 'center', 'right'])],
+            'mail_logo_label' => ['nullable', 'string', 'max:100'],
+            'info_lines' => ['nullable', 'array', 'max:8'],
+            'info_lines.*.label' => ['nullable', 'string', 'max:60'],
+            'info_lines.*.value' => ['nullable', 'string', 'max:200'],
             'mail_primary_color' => $color,
             'mail_bg_color' => $color,
             'mail_card_color' => $color,
@@ -50,10 +54,14 @@ class PresentationController extends Controller
             Setting::put('mail_logo_path', MailBranding::storeLogo($request->file('logo'), Setting::get('mail_logo_path')));
         }
 
+        // Bloc d'informations : paires libellé/valeur encodées en JSON.
+        Setting::put('mail_info_lines', MailBranding::encodeInfoLines($request->input('info_lines')));
+
         foreach ($data as $key => $value) {
-            if ($key !== 'logo') {
-                Setting::put($key, $value === null ? null : (string) $value);
+            if (in_array($key, ['logo', 'info_lines'], true)) {
+                continue; // gérés à part
             }
+            Setting::put($key, $value === null ? null : (string) $value);
         }
 
         return back()->with('success', 'Présentation enregistrée.');

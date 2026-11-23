@@ -23,14 +23,45 @@
                style="max-width:600px;background:{{ $b['card'] }};border-radius:10px;overflow:hidden;font-family:{{ $b['font'] }};color:{{ $b['text'] }};">
             <tr><td style="height:5px;background:{{ $b['primary'] }};font-size:0;line-height:0;">&nbsp;</td></tr>
 
-            @if($logoSrc)
+            {{-- En-tête : logo + libellé à côté (comme « [logo] Le service clients ») --}}
+            @if($b['logo_label'])
+                <tr><td align="{{ $b['logo_align'] }}" style="padding:24px 32px 6px;">
+                    <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+                        @if($logoSrc)
+                            <td valign="middle" style="padding-right:12px;">
+                                <img src="{{ $logoSrc }}" alt="{{ config('app.name') }}" width="{{ min($b['logo_width'], 120) }}" style="display:block;max-width:100%;height:auto;border:0;">
+                            </td>
+                        @endif
+                        <td valign="middle" style="font-size:17px;font-weight:bold;color:{{ $b['text'] }};">{{ $b['logo_label'] }}</td>
+                    </tr></table>
+                </td></tr>
+            @elseif($logoSrc)
                 <tr><td align="{{ $b['logo_align'] }}" style="padding:26px 32px 4px;">
                     <img src="{{ $logoSrc }}" alt="{{ config('app.name') }}" width="{{ $b['logo_width'] }}" style="display:block;max-width:100%;height:auto;border:0;">
                 </td></tr>
             @endif
 
             @if($b['header'])
-                <tr><td style="padding:18px 32px 0;font-size:20px;font-weight:bold;color:{{ $b['primary'] }};">{{ $b['header'] }}</td></tr>
+                <tr><td style="padding:16px 32px 4px;font-size:25px;font-weight:bold;line-height:1.2;color:{{ $b['text'] }};">{{ $b['header'] }}</td></tr>
+            @endif
+
+            {{-- Bloc d'informations à libellés (paramétré par l'admin), encadré comme la maquette --}}
+            @if($b['info_lines'])
+                <tr><td style="padding:10px 32px 6px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #e6e6e6;border-bottom:1px solid #e6e6e6;">
+                        <tr>
+                            <td valign="top" width="30" style="padding:12px 0;">
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='%23999'%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3Cpath d='M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8z'/%3E%3C/svg%3E" width="20" height="20" alt="" style="display:block;border:0;">
+                            </td>
+                            <td style="padding:12px 4px;font-size:13px;line-height:1.75;color:{{ $b['text'] }};">
+                                @foreach($b['info_lines'] as $line)
+                                    @php $sep = ($line['label'] !== '' && $line['value'] !== '') ? ' : ' : ''; @endphp
+                                    @if($line['label'])<strong>{{ $line['label'] }}</strong>@endif{{ $sep }}{{ $line['value'] }}@if(! $loop->last)<br>@endif
+                                @endforeach
+                            </td>
+                        </tr>
+                    </table>
+                </td></tr>
             @endif
 
             <tr><td style="padding:20px 32px 8px;font-size:15px;line-height:1.65;">{!! nl2br(e($body)) !!}</td></tr>
