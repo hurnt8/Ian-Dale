@@ -63,7 +63,7 @@ class PreviewController extends Controller
             'form' => $page->form,
             'branding' => $b,
             'logo' => \App\Support\MailBranding::dataUri($page->logo_path) ?? \App\Support\MailBranding::dataUri(\App\Models\Setting::get('mail_logo_path')),
-            'logoAlign' => $b['logo_align'],
+            'logoAlign' => $page->form['logo_align'] ?? $b['logo_align'],
             'action' => null, // aperçu : rien n'est enregistré
         ]);
     }

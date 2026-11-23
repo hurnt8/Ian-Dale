@@ -101,6 +101,15 @@
                             @endif
                         </div>
                     </div>
+                    @php $logoAlign = old('logo_align', $page->form['logo_align'] ?? 'center'); @endphp
+                    <div class="mt-3" style="max-width: 260px">
+                        <label class="form-label">Position du logo</label>
+                        <select name="logo_align" class="form-select">
+                            @foreach(['left' => 'Gauche', 'center' => 'Centré', 'right' => 'Droite'] as $v => $l)
+                                <option value="{{ $v }}" @selected($logoAlign === $v)>{{ $l }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
             </div>
 

@@ -37,6 +37,7 @@ class PageTest extends TestCase
 
         $this->actingAs($admin)->post(route('admin.pages.store'), [
             'is_published' => '1',
+            'logo_align' => 'left',
             'form' => [
                 'title' => 'Contact rapide',
                 'submit_label' => 'Envoyer',
@@ -50,6 +51,7 @@ class PageTest extends TestCase
         $page = Page::firstOrFail();
         $this->assertSame('contact-rapide', $page->slug);
         $this->assertTrue($page->is_published);
+        $this->assertSame('left', $page->form['logo_align']); // position du logo enregistrée
         $this->assertSame(['votre_message'], array_column($page->form['fields'], 'key'));
     }
 

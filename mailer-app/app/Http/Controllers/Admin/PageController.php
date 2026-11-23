@@ -105,6 +105,9 @@ class PageController extends Controller
         $form = ResponseForm::normalize($request->input('form'));
         // Une vue publique n'a de sens que si elle est activée et possède des champs.
         $form['enabled'] = true;
+        // Position du logo propre à la vue (gauche / centré / droite).
+        $align = $request->input('logo_align');
+        $form['logo_align'] = in_array($align, ['left', 'center', 'right'], true) ? $align : 'center';
 
         return [
             'form' => $form,

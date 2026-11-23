@@ -59,7 +59,7 @@ class PublicPageController extends Controller
             'form' => $page->form,
             'branding' => $b,
             'logo' => MailBranding::dataUri($page->logo_path) ?? MailBranding::dataUri(Setting::get('mail_logo_path')),
-            'logoAlign' => $b['logo_align'],
+            'logoAlign' => $page->form['logo_align'] ?? $b['logo_align'],
             'action' => route('page.store', $page->slug),
         ];
     }
