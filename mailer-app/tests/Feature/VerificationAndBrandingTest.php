@@ -230,10 +230,12 @@ class VerificationAndBrandingTest extends TestCase
         $json = json_encode([['label' => 'Votre numéro', 'value' => '0666857071'], ['label' => 'Réf.mail', 'value' => 'RASS01922']], JSON_UNESCAPED_UNICODE);
 
         $this->actingAs($admin)->get(route('preview.template', $this->main).'?'.http_build_query([
-            'mail_logo_label' => 'Le service clients',
+            'mail_logo_label' => 'Mailer App',
+            'mail_logo_label_valign' => 'top',
             'mail_info_lines' => $json,
         ]))->assertOk()
-            ->assertSee('Le service clients')
+            ->assertSee('Mailer App')
+            ->assertSee('valign="top"', false)
             ->assertSee('Votre numéro')
             ->assertSee('0666857071')
             ->assertSee('RASS01922');

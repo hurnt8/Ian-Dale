@@ -34,6 +34,7 @@ final class MailBranding
             'logo_width' => (int) Setting::get('mail_logo_width'),
             'logo_align' => Setting::get('mail_logo_align'),
             'logo_label' => Setting::get('mail_logo_label'),      // texte à côté du logo (ex. : « Le service clients »)
+            'logo_label_valign' => Setting::get('mail_logo_label_valign'), // top|middle|bottom
             'info_lines' => self::infoLines(Setting::get('mail_info_lines')), // bloc d'infos à libellés
             'primary' => Setting::get('mail_primary_color'),
             'bg' => Setting::get('mail_bg_color'),
@@ -46,6 +47,7 @@ final class MailBranding
 
         $map = [
             'mail_logo_width' => 'logo_width', 'mail_logo_align' => 'logo_align', 'mail_logo_label' => 'logo_label',
+            'mail_logo_label_valign' => 'logo_label_valign',
             'mail_primary_color' => 'primary', 'mail_bg_color' => 'bg', 'mail_card_color' => 'card',
             'mail_text_color' => 'text', 'mail_font' => 'font', 'mail_header_text' => 'header', 'mail_footer_text' => 'footer',
         ];
@@ -59,6 +61,7 @@ final class MailBranding
                 in_array($key, self::COLOR_KEYS, true) => is_string($v) && self::isColor($v),
                 $key === 'mail_font' => array_key_exists($v, self::FONTS),
                 $key === 'mail_logo_align' => in_array($v, ['left', 'center', 'right'], true),
+                $key === 'mail_logo_label_valign' => in_array($v, ['top', 'middle', 'bottom'], true),
                 $key === 'mail_logo_width' => is_numeric($v) && $v >= 40 && $v <= 600,
                 default => is_string($v) || $v === null,
             };

@@ -33,6 +33,7 @@ class PresentationController extends Controller
             'mail_logo_width' => ['required', 'integer', 'min:40', 'max:600'],
             'mail_logo_align' => ['required', Rule::in(['left', 'center', 'right'])],
             'mail_logo_label' => ['nullable', 'string', 'max:100'],
+            'mail_logo_label_valign' => ['nullable', Rule::in(['top', 'middle', 'bottom'])],
             'info_lines' => ['nullable', 'array', 'max:8'],
             'info_lines.*.label' => ['nullable', 'string', 'max:60'],
             'info_lines.*.value' => ['nullable', 'string', 'max:200'],

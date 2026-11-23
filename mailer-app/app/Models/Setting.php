@@ -29,6 +29,7 @@ class Setting extends Model
         'mail_logo_width' => '160',
         'mail_logo_align' => 'center',
         'mail_logo_label' => null,  // texte affiché à côté du logo
+        'mail_logo_label_valign' => 'middle', // alignement vertical du texte à côté du logo (top|middle|bottom)
         'mail_info_lines' => null,  // bloc d'informations (JSON : [{label, value}])
         'mail_primary_color' => '#4f46e5',
         'mail_bg_color' => '#f4f5fa',

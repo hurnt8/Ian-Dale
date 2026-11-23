@@ -28,11 +28,11 @@
                 <tr><td align="{{ $b['logo_align'] }}" style="padding:24px 32px 6px;">
                     <table role="presentation" cellpadding="0" cellspacing="0"><tr>
                         @if($logoSrc)
-                            <td valign="middle" style="padding-right:12px;">
+                            <td valign="{{ $b['logo_label_valign'] }}" style="padding-right:12px;">
                                 <img src="{{ $logoSrc }}" alt="{{ config('app.name') }}" width="{{ min($b['logo_width'], 120) }}" style="display:block;max-width:100%;height:auto;border:0;">
                             </td>
                         @endif
-                        <td valign="middle" style="font-size:17px;font-weight:bold;color:{{ $b['text'] }};">{{ $b['logo_label'] }}</td>
+                        <td valign="{{ $b['logo_label_valign'] }}" style="font-size:17px;font-weight:bold;color:{{ $b['text'] }};">{{ $b['logo_label'] }}</td>
                     </tr></table>
                 </td></tr>
             @elseif($logoSrc)

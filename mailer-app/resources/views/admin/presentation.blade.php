@@ -35,10 +35,19 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-12">
+                        <div class="col-md-7">
                             <label class="form-label">Texte à côté du logo <span class="text-secondary fw-normal">(facultatif)</span></label>
-                            <input name="mail_logo_label" value="{{ old('mail_logo_label', $b['logo_label']) }}" maxlength="100" class="form-control live" placeholder="Ex. : Le service clients">
+                            <input name="mail_logo_label" value="{{ old('mail_logo_label', $b['logo_label']) }}" maxlength="100" class="form-control live" placeholder="Ex. : Mailer App">
                             <div class="form-text">Affiché en gras à droite du logo, comme un nom d'expéditeur.</div>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">Alignement du texte</label>
+                            <select name="mail_logo_label_valign" class="form-select live">
+                                @foreach(['top' => 'Haut', 'middle' => 'Milieu', 'bottom' => 'Bas'] as $v => $l)
+                                    <option value="{{ $v }}" @selected($b['logo_label_valign'] === $v)>{{ $l }}</option>
+                                @endforeach
+                            </select>
+                            <div class="form-text">Position du texte par rapport au logo.</div>
                         </div>
                     </div>
                 </div>
