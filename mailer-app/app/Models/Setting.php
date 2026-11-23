@@ -14,7 +14,7 @@ class Setting extends Model
 
     public const DEFAULTS = [
         // --- Comportement ---
-        'require_approval' => '1',  // l'admin valide chaque liste avant l'envoi automatique
+        'require_approval' => '0',  // envoi automatique par défaut (mettre à 1 pour exiger une validation admin)
         'per_minute' => '20',       // nombre max d'emails envoyés par minute
         'max_recipients' => '500',  // taille max d'une liste soumise
         'skip_invalid' => '1',      // ne pas envoyer aux adresses dont la vérification échoue

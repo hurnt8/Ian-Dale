@@ -78,9 +78,7 @@
                 </td></tr>
             @endif
 
-            <tr><td style="padding:24px 32px;font-size:12px;line-height:1.5;color:#8a8fa3;border-top:1px solid #eceef3;">
 
-            </td></tr>
         </table>
     </td></tr>
 </table>

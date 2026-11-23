@@ -46,6 +46,7 @@ class ExampleTest extends TestCase
     public function test_propet_submission_waits_for_admin_then_sends_automatically(): void
     {
         Mail::fake();
+        Setting::put('require_approval', '1'); // ce test couvre explicitement le mode « validation requise »
         $admin = User::factory()->admin()->create();
         $propet = User::factory()->create();
         Unsubscribe::create(['email' => 'stop@example.fr']);
