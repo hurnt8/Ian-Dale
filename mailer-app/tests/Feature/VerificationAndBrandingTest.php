@@ -224,6 +224,21 @@ class VerificationAndBrandingTest extends TestCase
         $this->assertStringContainsString('Vos services sont rétablis', $html);
     }
 
+    public function test_live_preview_applies_logo_label_and_info_lines_overrides(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $json = json_encode([['label' => 'Votre numéro', 'value' => '0666857071'], ['label' => 'Réf.mail', 'value' => 'RASS01922']], JSON_UNESCAPED_UNICODE);
+
+        $this->actingAs($admin)->get(route('preview.template', $this->main).'?'.http_build_query([
+            'mail_logo_label' => 'Le service clients',
+            'mail_info_lines' => $json,
+        ]))->assertOk()
+            ->assertSee('Le service clients')
+            ->assertSee('Votre numéro')
+            ->assertSee('0666857071')
+            ->assertSee('RASS01922');
+    }
+
     public function test_template_logo_overrides_global_logo_and_behaviour_settings_apply(): void
     {
         $admin = User::factory()->admin()->create();
