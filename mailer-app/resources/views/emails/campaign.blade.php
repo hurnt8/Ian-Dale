@@ -21,7 +21,6 @@
     <tr><td align="center" style="padding:28px 12px;">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
                style="max-width:600px;background:{{ $b['card'] }};border-radius:10px;overflow:hidden;font-family:{{ $b['font'] }};color:{{ $b['text'] }};">
-            <tr><td style="height:5px;background:{{ $b['primary'] }};font-size:0;line-height:0;">&nbsp;</td></tr>
 
             {{-- En-tête : logo + libellé à côté (comme « [logo] Le service clients ») --}}
             @if($b['logo_label'])
@@ -78,7 +77,11 @@
                 </td></tr>
             @endif
 
-
+            {{-- Pied de page : le texte est optionnel (réglable dans Présentation), mais le lien de désinscription est OBLIGATOIRE et toujours affiché. --}}
+            <tr><td style="padding:24px 32px;font-size:12px;line-height:1.5;color:#8a8fa3;border-top:1px solid #eceef3;">
+                @if($b['footer']){!! nl2br(e($b['footer'])) !!}<br>@endif
+                <a href="{{ $unsubscribeUrl }}" style="color:#8a8fa3;">Se désinscrire</a>
+            </td></tr>
         </table>
     </td></tr>
 </table>

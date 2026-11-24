@@ -26,9 +26,9 @@ class CampaignController extends Controller
         return view('propet.campaigns.index', compact('campaigns'));
     }
 
-    public function create(): View
+    public function create(Request $request): View
     {
-        $templates = MessageTemplate::available()->get();
+        $templates = $request->user()->availableTemplates();
 
         return view('propet.campaigns.create', [
             'templates' => $templates,
@@ -41,12 +41,15 @@ class CampaignController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        // L'agent ne peut utiliser que les messages qui lui sont autorisés (et actifs).
+        $allowedIds = $request->user()->availableTemplates()->pluck('id')->all();
+
         $data = $request->validate([
             'title' => ['required', 'string', 'max:150'],
-            'message_template_id' => ['required', 'integer', Rule::exists('message_templates', 'id')->where('is_active', true)],
+            'message_template_id' => ['required', 'integer', Rule::in($allowedIds)],
             'emails' => ['required', 'string', 'max:200000'],
         ], [
-            'message_template_id.*' => 'Choisissez un message disponible.',
+            'message_template_id.in' => 'Ce message ne fait pas partie de ceux qui vous sont autorisés.',
         ]);
 
         $template = MessageTemplate::findOrFail($data['message_template_id']);
