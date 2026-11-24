@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\Role;
 use App\Http\Controllers\Controller;
-use App\Models\MessageTemplate;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -21,11 +20,7 @@ class UserController extends Controller
 
     public function create(): View
     {
-        return view('admin.users.form', [
-            'user' => new User(['role' => Role::Propet, 'is_active' => true]),
-            'templates' => MessageTemplate::available()->get(),
-            'assigned' => [],
-        ]);
+        return view('admin.users.form', ['user' => new User(['role' => Role::Propet, 'is_active' => true])]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -35,23 +30,16 @@ class UserController extends Controller
             'email' => ['required', 'email', 'max:190', 'unique:users,email'],
             'role' => ['required', Rule::enum(Role::class)],
             'password' => ['required', Password::min(8)],
-            'templates' => ['sometimes', 'array'],
-            'templates.*' => ['integer', Rule::exists('message_templates', 'id')],
         ]);
 
-        $user = User::create(['name' => $data['name'], 'email' => $data['email'], 'role' => $data['role'], 'password' => $data['password'], 'is_active' => true]);
-        $user->allowedTemplates()->sync($data['templates'] ?? []);
+        User::create([...$data, 'is_active' => true]);
 
         return redirect()->route('admin.users.index')->with('success', 'Utilisateur créé.');
     }
 
     public function edit(User $user): View
     {
-        return view('admin.users.form', [
-            'user' => $user,
-            'templates' => MessageTemplate::available()->get(),
-            'assigned' => $user->allowedTemplates()->pluck('message_templates.id')->all(),
-        ]);
+        return view('admin.users.form', compact('user'));
     }
 
     public function update(Request $request, User $user): RedirectResponse
@@ -62,16 +50,11 @@ class UserController extends Controller
             'role' => ['required', Rule::enum(Role::class)],
             'password' => ['nullable', Password::min(8)],
             'is_active' => ['sometimes', 'boolean'],
-            'templates' => ['sometimes', 'array'],
-            'templates.*' => ['integer', Rule::exists('message_templates', 'id')],
         ]);
 
         if ($user->is($request->user()) && ($data['role'] !== Role::Admin->value || ! $request->boolean('is_active'))) {
             return back()->with('error', 'Vous ne pouvez pas retirer vos propres droits admin ni désactiver votre compte.');
         }
-
-        $templates = $data['templates'] ?? [];
-        unset($data['templates']);
 
         if (empty($data['password'])) {
             unset($data['password']);
@@ -79,7 +62,6 @@ class UserController extends Controller
         $data['is_active'] = $request->boolean('is_active');
 
         $user->update($data);
-        $user->allowedTemplates()->sync($templates);
 
         return redirect()->route('admin.users.index')->with('success', 'Utilisateur mis à jour.');
     }
