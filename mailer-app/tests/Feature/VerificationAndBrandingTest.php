@@ -162,12 +162,12 @@ class VerificationAndBrandingTest extends TestCase
         $this->assertNotNull($logo);
         Storage::disk('local')->assertExists($logo);
 
-        // Aperçu
+        // Aperçu (la présentation est appliquée : fond, textes, logo)
         $this->actingAs($admin)->get(route('preview.template', $this->main))
-            ->assertOk()->assertSee('#ff6600')->assertSee('Lettre de la mairie')->assertSee('Mairie de Test')->assertSee('data:image/png;base64', false);
+            ->assertOk()->assertSee('#eeeeee')->assertSee('Lettre de la mairie')->assertSee('Mairie de Test')->assertSee('data:image/png;base64', false);
 
         // Aperçu en direct (valeurs non enregistrées) ; valeurs invalides ignorées
-        $this->actingAs($admin)->get(route('preview.template', $this->main).'?mail_primary_color=%23123456&mail_bg_color=red;}')
+        $this->actingAs($admin)->get(route('preview.template', $this->main).'?mail_bg_color=%23123456&mail_primary_color=red;}')
             ->assertSee('#123456')->assertDontSee('red;}');
 
         // Envoi réel (transport "array") : le logo est une pièce jointe inline (CID)
@@ -181,7 +181,7 @@ class VerificationAndBrandingTest extends TestCase
         $this->assertCount(1, $sent->getAttachments());
         $this->assertSame('inline', $sent->getAttachments()[0]->getDisposition());
         $this->assertStringContainsString('cid:', $sent->getHtmlBody());
-        $this->assertStringContainsString('#ff6600', $sent->getHtmlBody());
+        $this->assertStringContainsString('#eeeeee', $sent->getHtmlBody());
     }
 
     public function test_logo_label_and_info_block_render_in_the_email(): void
