@@ -104,4 +104,28 @@
 @endforelse
 
 @if($responses->hasPages())<div class="mt-3">{{ $responses->links() }}</div>@endif
+
+@if($pageResponses->isNotEmpty())
+    <h2 class="h6 fw-bold mt-5 mb-1"><i class="bi bi-window me-1"></i> Réponses des vues</h2>
+    <div class="text-secondary small mb-3">{{ $isAdmin ? 'Formulaires remplis sur les pages publiques /vue/…' : 'Formulaires remplis sur les pages publiques /vue/… qui vous sont attribuées' }} (30 dernières). Pour tout voir ou exporter, ouvrez la vue concernée.</div>
+    @foreach($pageResponses as $pr)
+        <div class="card mb-3">
+            <div class="card-header">
+                <span class="fw-semibold text-truncate">{{ $pr->page->title() }}</span>
+                <span class="small text-secondary fw-normal text-end">
+                    <a href="{{ route($prefix.'.pages.responses', $pr->page) }}" class="text-decoration-none">Toutes les réponses de cette vue</a>
+                    · {{ $pr->created_at->format('d/m/Y H:i') }}
+                </span>
+            </div>
+            <div class="card-body py-2">
+                <dl class="row mb-0">
+                    @foreach($pr->answers as $a)
+                        <dt class="col-sm-4 text-secondary fw-semibold small py-1">{{ $a['label'] }}</dt>
+                        <dd class="col-sm-8 py-1 mb-0" style="white-space: pre-line">{{ \App\Support\ResponseForm::display($a) }}</dd>
+                    @endforeach
+                </dl>
+            </div>
+        </div>
+    @endforeach
+@endif
 @endsection

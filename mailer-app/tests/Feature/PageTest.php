@@ -159,6 +159,20 @@ class PageTest extends TestCase
         $this->actingAs($alice)->get(route('propet.pages.responses', $page))->assertOk();
     }
 
+    public function test_view_responses_appear_in_propet_responses_page(): void
+    {
+        $alice = User::factory()->create();
+        $bob = User::factory()->create();
+        $page = $this->publishedPage();
+        $page->agents()->sync([$alice->id]);
+
+        $this->post(route('page.store', $page->slug), ['answers' => ['votre_nom' => 'Zoé', 'votre_note' => 5]]);
+
+        $this->actingAs($alice)->get(route('propet.responses.index'))->assertOk()
+            ->assertSee('Réponses des vues')->assertSee('Zoé');
+        $this->actingAs($bob)->get(route('propet.responses.index'))->assertOk()->assertDontSee('Zoé');
+    }
+
     public function test_thanks_screen_has_no_back_button(): void
     {
         $page = $this->publishedPage();

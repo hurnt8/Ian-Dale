@@ -38,7 +38,7 @@
             <form method="POST" action="{{ $action ?? '#' }}" @if(! $action) onsubmit="event.preventDefault(); alert('Aperçu : la réponse n\'est pas enregistrée.')" @endif novalidate>
                 @csrf
                 @include('partials.public-fields', ['form' => $form, 'old' => $old])
-                <button class="pub-submit">{{ $form['submit_label'] }}</button>
+
             </form>
         </div>
     @endif

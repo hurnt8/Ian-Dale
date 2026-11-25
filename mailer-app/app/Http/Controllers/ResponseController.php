@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\Role;
 use App\Models\Campaign;
+use App\Models\PageResponse;
 use App\Models\Response;
 use App\Models\User;
 use App\Support\ResponseForm;
@@ -38,7 +39,24 @@ class ResponseController extends Controller
             'propets' => $user->isAdmin() ? User::where('role', Role::Propet->value)->orderBy('name')->get(['id', 'name']) : collect(),
             'summary' => $request->filled('campaign') ? $this->summary((clone $base)->get()) : null,
             'isAdmin' => $user->isAdmin(),
+            'pageResponses' => $request->hasAny(['campaign', 'propet', 'q']) ? collect() : $this->pageResponses($user),
         ]);
+    }
+
+    /**
+     * Dernières réponses déposées sur les vues (pages /vue/…) :
+     * celles attribuées à l'agent, ou toutes pour l'admin.
+     *
+     * @return \Illuminate\Support\Collection<int,PageResponse>
+     */
+    private function pageResponses(User $user)
+    {
+        return PageResponse::query()
+            ->when(! $user->isAdmin(), fn (Builder $q) => $q->whereHas('page.agents', fn (Builder $a) => $a->whereKey($user->id)))
+            ->with('page')
+            ->latest()
+            ->limit(30)
+            ->get();
     }
 
     public function export(Request $request): StreamedResponse
