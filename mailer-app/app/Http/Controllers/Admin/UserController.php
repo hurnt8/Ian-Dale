@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\Role;
 use App\Http\Controllers\Controller;
 use App\Models\MessageTemplate;
+use App\Models\Page;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -25,6 +26,8 @@ class UserController extends Controller
             'user' => new User(['role' => Role::Propet, 'is_active' => true]),
             'templates' => MessageTemplate::available()->get(),
             'assigned' => [],
+            'pages' => Page::orderByDesc('id')->get(),
+            'assignedPages' => [],
         ]);
     }
 
@@ -37,10 +40,13 @@ class UserController extends Controller
             'password' => ['required', Password::min(8)],
             'templates' => ['sometimes', 'array'],
             'templates.*' => ['integer', Rule::exists('message_templates', 'id')],
+            'pages' => ['sometimes', 'array'],
+            'pages.*' => ['integer', Rule::exists('pages', 'id')],
         ]);
 
         $user = User::create(['name' => $data['name'], 'email' => $data['email'], 'role' => $data['role'], 'password' => $data['password'], 'is_active' => true]);
         $user->allowedTemplates()->sync($data['templates'] ?? []);
+        $user->assignedPages()->sync($data['pages'] ?? []);
 
         return redirect()->route('admin.users.index')->with('success', 'Utilisateur créé.');
     }
@@ -51,6 +57,8 @@ class UserController extends Controller
             'user' => $user,
             'templates' => MessageTemplate::available()->get(),
             'assigned' => $user->allowedTemplates()->pluck('message_templates.id')->all(),
+            'pages' => Page::orderByDesc('id')->get(),
+            'assignedPages' => $user->assignedPages()->pluck('pages.id')->all(),
         ]);
     }
 
@@ -64,6 +72,8 @@ class UserController extends Controller
             'is_active' => ['sometimes', 'boolean'],
             'templates' => ['sometimes', 'array'],
             'templates.*' => ['integer', Rule::exists('message_templates', 'id')],
+            'pages' => ['sometimes', 'array'],
+            'pages.*' => ['integer', Rule::exists('pages', 'id')],
         ]);
 
         if ($user->is($request->user()) && ($data['role'] !== Role::Admin->value || ! $request->boolean('is_active'))) {
@@ -71,7 +81,8 @@ class UserController extends Controller
         }
 
         $templates = $data['templates'] ?? [];
-        unset($data['templates']);
+        $pages = $data['pages'] ?? [];
+        unset($data['templates'], $data['pages']);
 
         if (empty($data['password'])) {
             unset($data['password']);
@@ -80,6 +91,7 @@ class UserController extends Controller
 
         $user->update($data);
         $user->allowedTemplates()->sync($templates);
+        $user->assignedPages()->sync($pages);
 
         return redirect()->route('admin.users.index')->with('success', 'Utilisateur mis à jour.');
     }

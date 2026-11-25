@@ -56,6 +56,21 @@
                     <div class="text-secondary small">Aucun message disponible. Créez-en dans Admin &gt; Messages.</div>
                 @endforelse
             </div>
+
+            <div class="col-12">
+                <label class="form-label">Vues dont cet agent voit les réponses</label>
+                <div class="form-text mb-2">Cochez les vues (pages publiques /vue/…) dont ce propet peut consulter et exporter les réponses, dans son menu « Vues ». (Sans effet pour un admin, qui voit tout.)</div>
+                @php $assignedPageIds = array_map('strval', old('pages', $assignedPages ?? [])); @endphp
+                @forelse($pages as $p)
+                    <div class="form-check">
+                        <input type="checkbox" name="pages[]" value="{{ $p->id }}" class="form-check-input" id="page{{ $p->id }}"
+                               @checked(in_array((string) $p->id, $assignedPageIds, true))>
+                        <label class="form-check-label" for="page{{ $p->id }}">{{ $p->title() }} <span class="text-secondary small">/vue/{{ $p->slug }}</span>@unless($p->is_published)<span class="badge bg-light text-secondary ms-1">brouillon</span>@endunless</label>
+                    </div>
+                @empty
+                    <div class="text-secondary small">Aucune vue. Créez-en dans Admin &gt; Vues.</div>
+                @endforelse
+            </div>
         </div>
         <div class="mt-4 d-flex gap-2">
             <button class="btn btn-primary"><i class="bi bi-check2 me-1"></i> Enregistrer</button>

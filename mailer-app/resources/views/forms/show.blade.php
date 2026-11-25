@@ -11,8 +11,6 @@
         <div class="pub-done">
             <div class="ic"><i class="bi bi-check-lg"></i></div>
             <h1 class="h4 fw-bold">{{ $form['thanks'] }}</h1>
-            <p class="text-secondary mb-4">Vous pouvez modifier votre réponse à tout moment avec le même lien.</p>
-            <a href="{{ url()->current() }}" class="btn btn-light">Modifier ma réponse</a>
         </div>
     @elseif($closed)
         <div class="pub-done closed">

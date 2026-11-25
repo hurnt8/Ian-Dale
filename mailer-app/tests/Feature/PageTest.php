@@ -141,6 +141,24 @@ class PageTest extends TestCase
         $this->actingAs($bob)->get(route('propet.pages.responses.export', $page))->assertNotFound();
     }
 
+    public function test_admin_assigns_views_from_the_agent_screen(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $alice = User::factory()->create(['name' => 'Alice', 'email' => 'alice@example.fr']);
+        $page = $this->publishedPage();
+
+        $this->actingAs($admin)->get(route('admin.users.edit', $alice))->assertOk()
+            ->assertSee('Vues dont cet agent voit les réponses')->assertSee('/vue/inscription');
+
+        $this->actingAs($admin)->put(route('admin.users.update', $alice), [
+            'name' => 'Alice', 'email' => 'alice@example.fr', 'role' => 'propet', 'is_active' => 1,
+            'pages' => [$page->id],
+        ])->assertRedirect(route('admin.users.index'));
+
+        $this->assertSame([$page->id], $alice->assignedPages()->pluck('pages.id')->all());
+        $this->actingAs($alice)->get(route('propet.pages.responses', $page))->assertOk();
+    }
+
     public function test_thanks_screen_has_no_back_button(): void
     {
         $page = $this->publishedPage();
