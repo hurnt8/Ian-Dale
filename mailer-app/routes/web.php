@@ -62,6 +62,9 @@ Route::middleware(['auth', 'role:propet'])->prefix('propet')->name('propet.')->g
     Route::get('/emails', [RecipientController::class, 'index'])->name('emails.index');
     Route::get('/reponses', [ResponseController::class, 'index'])->name('responses.index');
     Route::get('/reponses/export', [ResponseController::class, 'export'])->name('responses.export');
+    Route::get('/vues', [Propet\PageController::class, 'index'])->name('pages.index');
+    Route::get('/vues/{page}/reponses', [Propet\PageController::class, 'responses'])->name('pages.responses');
+    Route::get('/vues/{page}/reponses/export', [Propet\PageController::class, 'exportResponses'])->name('pages.responses.export');
 });
 
 // --- Espace ADMIN ---

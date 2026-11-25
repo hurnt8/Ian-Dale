@@ -116,6 +116,20 @@
                 </div>
             </div></div>
 
+            <div class="card mb-4"><div class="card-body">
+                <div class="fw-semibold mb-1"><i class="bi bi-people me-1"></i>Agents qui voient les réponses</div>
+                <div class="form-text mb-2">Les propets cochés retrouvent cette vue et ses réponses dans leur espace (menu « Vues »). L'admin voit toujours tout.</div>
+                @php $assignedIds = array_map('strval', old('agents', $assigned ?? [])); @endphp
+                @forelse($propets as $p)
+                    <div class="form-check">
+                        <input type="checkbox" name="agents[]" value="{{ $p->id }}" class="form-check-input" id="agent{{ $p->id }}" @checked(in_array((string) $p->id, $assignedIds, true))>
+                        <label class="form-check-label" for="agent{{ $p->id }}">{{ $p->name }} <span class="text-secondary small">{{ $p->email }}</span></label>
+                    </div>
+                @empty
+                    <div class="text-secondary small">Aucun propet. Créez-en dans Admin &gt; Utilisateurs.</div>
+                @endforelse
+            </div></div>
+
             <div class="d-flex gap-2">
                 <button class="btn btn-primary"><i class="bi bi-check2 me-1"></i> Enregistrer</button>
                 <a href="{{ route('admin.pages.index') }}" class="btn btn-light">Annuler</a>

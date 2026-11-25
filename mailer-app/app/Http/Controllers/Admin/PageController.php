@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\Role;
 use App\Http\Controllers\Controller;
 use App\Models\Page;
+use App\Models\User;
 use App\Support\MailBranding;
+use App\Support\PageResponsesExport;
 use App\Support\ResponseForm;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -27,12 +30,13 @@ class PageController extends Controller
 
     public function create(): View
     {
-        return view('admin.pages.form', ['page' => new Page(['is_published' => true]), 'logo' => null]);
+        return view('admin.pages.form', $this->formData(new Page(['is_published' => true])));
     }
 
     public function store(Request $request): RedirectResponse
     {
         $page = Page::create($this->validated($request));
+        $this->syncAgents($request, $page);
         $this->handleLogo($request, $page);
 
         return redirect()->route('admin.pages.edit', $page)->with('success', 'Vue créée.');
@@ -40,12 +44,13 @@ class PageController extends Controller
 
     public function edit(Page $page): View
     {
-        return view('admin.pages.form', ['page' => $page, 'logo' => MailBranding::dataUri($page->logo_path)]);
+        return view('admin.pages.form', $this->formData($page));
     }
 
     public function update(Request $request, Page $page): RedirectResponse
     {
         $page->update($this->validated($request, $page));
+        $this->syncAgents($request, $page);
         $this->handleLogo($request, $page);
 
         return back()->with('success', 'Vue mise à jour.');
@@ -71,26 +76,28 @@ class PageController extends Controller
 
     public function exportResponses(Page $page): StreamedResponse
     {
-        $fields = $page->form['fields'] ?? [];
-        $headers = ['Date', ...array_column($fields, 'label')];
+        return PageResponsesExport::download($page);
+    }
 
-        return response()->streamDownload(function () use ($page, $fields, $headers) {
-            $out = fopen('php://output', 'wb');
-            fprintf($out, "\xEF\xBB\xBF"); // BOM UTF-8 pour Excel
-            fputcsv($out, $headers, ';');
+    /** Données communes au formulaire de création / modification. */
+    private function formData(Page $page): array
+    {
+        return [
+            'page' => $page,
+            'logo' => MailBranding::dataUri($page->logo_path),
+            'propets' => User::where('role', Role::Propet->value)->orderBy('name')->get(['id', 'name', 'email']),
+            'assigned' => $page->exists ? $page->agents()->pluck('users.id')->all() : [],
+        ];
+    }
 
-            $page->responses()->latest()->chunk(200, function ($chunk) use ($out, $fields) {
-                foreach ($chunk as $resp) {
-                    $byKey = collect($resp->answers)->keyBy('key');
-                    $row = [$resp->created_at->format('d/m/Y H:i')];
-                    foreach ($fields as $f) {
-                        $row[] = $byKey->has($f['key']) ? ResponseForm::display($byKey[$f['key']]) : '';
-                    }
-                    fputcsv($out, $row, ';');
-                }
-            });
-            fclose($out);
-        }, 'reponses-'.$page->slug.'.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
+    /** Enregistre les agents autorisés à voir les réponses (seuls des propets). */
+    private function syncAgents(Request $request, Page $page): void
+    {
+        $ids = User::where('role', Role::Propet->value)
+            ->whereIn('id', array_map('intval', (array) $request->input('agents', [])))
+            ->pluck('id');
+
+        $page->agents()->sync($ids);
     }
 
     /** @return array<string,mixed> */
@@ -100,6 +107,8 @@ class PageController extends Controller
             'logo' => ['nullable', 'image', 'mimes:png,jpg,jpeg,gif,webp', 'max:1024'],
             'form' => ['nullable', 'array'],
             'form.fields' => ['nullable', 'array', 'max:30'],
+            'agents' => ['sometimes', 'array'],
+            'agents.*' => ['integer'],
         ]);
 
         $form = ResponseForm::normalize($request->input('form'));

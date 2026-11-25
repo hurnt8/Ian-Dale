@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Support\ResponseForm;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
@@ -23,6 +24,12 @@ class Page extends Model
     public function responses(): HasMany
     {
         return $this->hasMany(PageResponse::class);
+    }
+
+    /** Agents (propets) autorisés à consulter les réponses de cette vue. */
+    public function agents(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class);
     }
 
     public function hasForm(): bool

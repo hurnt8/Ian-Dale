@@ -11,7 +11,6 @@
         <div class="pub-done">
             <div class="ic"><i class="bi bi-check-lg"></i></div>
             <h1 class="h4 fw-bold">{{ $form['thanks'] }}</h1>
-            <a href="{{ url()->current() }}" class="btn btn-light mt-3">Retour</a>
         </div>
     @else
         <div class="pub-body">

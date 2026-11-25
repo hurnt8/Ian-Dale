@@ -41,6 +41,12 @@ class User extends Authenticatable
         return $this->belongsToMany(MessageTemplate::class);
     }
 
+    /** Vues attribuées à cet agent par l'admin (il peut en consulter les réponses). */
+    public function assignedPages(): BelongsToMany
+    {
+        return $this->belongsToMany(Page::class);
+    }
+
     /**
      * Messages que cet agent peut réellement utiliser :
      * ceux qui lui sont attribués (et actifs), ou tous les messages actifs si aucune attribution.

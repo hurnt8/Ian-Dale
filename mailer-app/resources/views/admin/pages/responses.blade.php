@@ -1,13 +1,20 @@
-@php $fields = $page->form['fields'] ?? []; @endphp
+@php
+    $fields = $page->form['fields'] ?? [];
+    // Vue partagée admin / agent : les liens changent selon l'espace.
+    $backUrl ??= route('admin.pages.index');
+    $exportUrl ??= route('admin.pages.responses.export', $page);
+@endphp
 @extends('layouts.app')
 @section('title', 'Réponses — '.$page->title())
 @section('subtitle')
-    <a href="{{ route('admin.pages.index') }}" class="text-decoration-none"><i class="bi bi-arrow-left"></i> Vues</a>
+    <a href="{{ $backUrl }}" class="text-decoration-none"><i class="bi bi-arrow-left"></i> Vues</a>
 @endsection
 @section('actions')
-    <a href="{{ route('page.show', $page->slug) }}" target="_blank" class="btn btn-light"><i class="bi bi-box-arrow-up-right me-1"></i> Ouvrir la vue</a>
+    @if($page->is_published)
+        <a href="{{ route('page.show', $page->slug) }}" target="_blank" class="btn btn-light"><i class="bi bi-box-arrow-up-right me-1"></i> Ouvrir la vue</a>
+    @endif
     @if($responses->total())
-        <a href="{{ route('admin.pages.responses.export', $page) }}" class="btn btn-primary"><i class="bi bi-download me-1"></i> Exporter (CSV)</a>
+        <a href="{{ $exportUrl }}" class="btn btn-primary"><i class="bi bi-download me-1"></i> Exporter (CSV)</a>
     @endif
 @endsection
 

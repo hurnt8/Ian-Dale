@@ -114,6 +114,41 @@ class PageTest extends TestCase
         $this->actingAs($propet)->get(route('admin.pages.create'))->assertForbidden();
     }
 
+    public function test_assigned_agent_sees_view_responses_others_do_not(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $alice = User::factory()->create(['name' => 'Alice']);
+        $bob = User::factory()->create(['name' => 'Bob']);
+        $page = $this->publishedPage();
+
+        // L'admin attribue la vue à Alice depuis l'écran d'édition
+        $this->actingAs($admin)->put(route('admin.pages.update', $page), [
+            'form' => $page->form,
+            'is_published' => 1,
+            'agents' => [$alice->id, $admin->id], // un admin coché est ignoré
+        ])->assertRedirect();
+        $this->assertSame([$alice->id], $page->agents()->pluck('users.id')->all());
+
+        $this->post(route('page.store', $page->slug), ['answers' => ['votre_nom' => 'Zoé', 'votre_note' => 5]]);
+
+        $this->actingAs($alice)->get(route('propet.pages.index'))->assertOk()->assertSee('Inscription');
+        $this->actingAs($alice)->get(route('propet.pages.responses', $page))->assertOk()->assertSee('Zoé');
+        $csv = $this->actingAs($alice)->get(route('propet.pages.responses.export', $page))->streamedContent();
+        $this->assertStringContainsString('Zoé', $csv);
+
+        $this->actingAs($bob)->get(route('propet.pages.index'))->assertOk()->assertDontSee('Inscription');
+        $this->actingAs($bob)->get(route('propet.pages.responses', $page))->assertNotFound();
+        $this->actingAs($bob)->get(route('propet.pages.responses.export', $page))->assertNotFound();
+    }
+
+    public function test_thanks_screen_has_no_back_button(): void
+    {
+        $page = $this->publishedPage();
+
+        $this->post(route('page.store', $page->slug), ['answers' => ['votre_nom' => 'Alice', 'votre_note' => 5]]);
+        $this->get(route('page.show', $page->slug))->assertSee('Inscription enregistrée')->assertDontSee('Retour');
+    }
+
     public function test_builder_screens_render(): void
     {
         $admin = User::factory()->admin()->create();
