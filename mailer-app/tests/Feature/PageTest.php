@@ -89,17 +89,6 @@ class PageTest extends TestCase
         $this->get(route('page.show', $page->slug))->assertSee('Inscription enregistrée');
     }
 
-    public function test_submission_redirects_when_a_redirect_url_is_set(): void
-    {
-        $page = $this->publishedPage();
-        $page->update(['form' => array_merge($page->form, ['redirect_url' => 'https://exemple.fr/merci'])]);
-
-        $this->post(route('page.store', $page->slug), ['answers' => ['votre_nom' => 'Alice', 'votre_note' => 5]])
-            ->assertRedirect('https://exemple.fr/merci');
-
-        $this->assertSame(1, PageResponse::count()); // la réponse est bien enregistrée avant la redirection
-    }
-
     public function test_admin_sees_responses_and_can_export(): void
     {
         $admin = User::factory()->admin()->create();

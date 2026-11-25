@@ -49,11 +49,6 @@ class FormController extends Controller
             ]);
         }
 
-        // Redirection définie par l'admin, sinon message de remerciement sur place.
-        if (! empty($form['redirect_url'])) {
-            return redirect()->away($form['redirect_url']);
-        }
-
         return redirect()->route('form.show', $token)->with('thanks', true);
     }
 

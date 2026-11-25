@@ -34,11 +34,6 @@ class PublicPageController extends Controller
             'ip' => $request->ip(),
         ]);
 
-        // Si l'admin a défini une redirection, on y envoie le visiteur ; sinon on affiche le message.
-        if (! empty($form['redirect_url'])) {
-            return redirect()->away($form['redirect_url']);
-        }
-
         return redirect()->route('page.show', $page->slug)->with('thanks', true);
     }
 

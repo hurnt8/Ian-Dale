@@ -39,7 +39,6 @@ final class ResponseForm
         'button_text' => 'Donner mon avis',
         'submit_label' => 'Envoyer ma réponse',
         'thanks' => 'Merci, votre réponse a bien été enregistrée.',
-        'redirect_url' => '',   // si renseigné : redirection après l'envoi, au lieu d'afficher le message
         'fields' => [],
     ];
 
@@ -59,7 +58,6 @@ final class ResponseForm
             'button_text' => self::str($input['button_text'] ?? null, 60) ?: self::DEFAULTS['button_text'],
             'submit_label' => self::str($input['submit_label'] ?? null, 60) ?: self::DEFAULTS['submit_label'],
             'thanks' => self::str($input['thanks'] ?? null, 500) ?: self::DEFAULTS['thanks'],
-            'redirect_url' => self::url($input['redirect_url'] ?? null),
             'fields' => [],
         ];
 
@@ -189,13 +187,5 @@ final class ResponseForm
     private static function str(mixed $v, int $max): string
     {
         return is_scalar($v) ? mb_substr(trim((string) $v), 0, $max) : '';
-    }
-
-    /** Adresse de redirection valide (http/https) ou chaîne vide. */
-    private static function url(mixed $v): string
-    {
-        $v = self::str($v, 500);
-
-        return (filter_var($v, FILTER_VALIDATE_URL) && preg_match('#^https?://#i', $v)) ? $v : '';
     }
 }

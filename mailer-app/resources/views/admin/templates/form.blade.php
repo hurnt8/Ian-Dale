@@ -106,11 +106,6 @@
                             <label class="form-label">Message affiché après l'envoi</label>
                             <input name="form[thanks]" value="{{ $f['thanks'] }}" maxlength="500" class="form-control">
                         </div>
-                        <div class="col-12">
-                            <label class="form-label">…ou rediriger vers une adresse après l'envoi <span class="text-secondary small">(facultatif)</span></label>
-                            <input name="form[redirect_url]" type="url" value="{{ $f['redirect_url'] ?? '' }}" maxlength="500" class="form-control" placeholder="https://…">
-                            <div class="form-text">Si renseignée, le destinataire y est redirigé après avoir répondu, <strong>au lieu</strong> de voir le message de remerciement.</div>
-                        </div>
                     </div>
 
                     <label class="form-label mb-2">Champs du formulaire</label>

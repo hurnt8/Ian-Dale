@@ -140,18 +140,6 @@ class ResponseFormTest extends TestCase
         $this->get('/avis/'.str_repeat('a', 48))->assertNotFound();
     }
 
-    public function test_answer_redirects_when_the_admin_sets_a_redirect_url(): void
-    {
-        $r = $this->makeCampaign(User::factory()->create());
-        $r->campaign->update(['form' => array_merge($r->campaign->form, ['redirect_url' => 'https://exemple.fr/suite'])]);
-
-        $this->post(route('form.store', $r->token), [
-            'answers' => ['note_du_service' => 4, 'recommanderiez_vous' => 'oui'],
-        ])->assertRedirect('https://exemple.fr/suite');
-
-        $this->assertSame(1, Response::count()); // réponse enregistrée avant la redirection
-    }
-
     public function test_propet_sees_only_responses_to_own_lists(): void
     {
         $admin = User::factory()->admin()->create();
