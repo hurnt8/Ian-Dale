@@ -41,6 +41,21 @@
                     </div>
                 </div>
             @endif
+
+            <div class="col-12">
+                <label class="form-label">Messages autorisés pour cet agent</label>
+                <div class="form-text mb-2">Cochez les messages (et leurs formulaires) que ce propet peut utiliser lors d'un envoi. <strong>Si rien n'est coché, il peut utiliser tous les messages disponibles.</strong> (Sans effet pour un admin, qui voit tout.)</div>
+                @php $assignedIds = old('templates', $assigned ?? []); @endphp
+                @forelse($templates as $t)
+                    <div class="form-check">
+                        <input type="checkbox" name="templates[]" value="{{ $t->id }}" class="form-check-input" id="tpl{{ $t->id }}"
+                               @checked(in_array((string) $t->id, array_map('strval', $assignedIds), true))>
+                        <label class="form-check-label" for="tpl{{ $t->id }}">{{ $t->name }}@if($t->hasForm())<span class="badge bg-light text-secondary ms-1">formulaire</span>@endif</label>
+                    </div>
+                @empty
+                    <div class="text-secondary small">Aucun message disponible. Créez-en dans Admin &gt; Messages.</div>
+                @endforelse
+            </div>
         </div>
         <div class="mt-4 d-flex gap-2">
             <button class="btn btn-primary"><i class="bi bi-check2 me-1"></i> Enregistrer</button>
