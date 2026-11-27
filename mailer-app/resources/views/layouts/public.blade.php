@@ -10,12 +10,12 @@
 <body class="pub">
     <div class="pub-wrap">
         @php
-            // Bandeau et couleur d'accent choisis dans le formulaire (orange par défaut)
+            // Bandeau et couleur d'accent choisis dans le formulaire (aucun bandeau par défaut)
             $pubForm = isset($form) && is_array($form) ? $form : [];
             $pubAccent = \App\Support\ResponseForm::color($pubForm['accent_color'] ?? null);
         @endphp
         <div class="pub-card" style="--pub-accent: {{ $pubAccent }}">
-            @if($pubForm['show_bar'] ?? true)<div class="pub-bar"></div>@endif
+            @if($pubForm['show_bar'] ?? false)<div class="pub-bar"></div>@endif
             @isset($logo)
                 @if($logo)
                     <div class="pub-logo {{ $logoAlign ?? 'center' }}">

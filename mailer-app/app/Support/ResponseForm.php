@@ -39,7 +39,7 @@ final class ResponseForm
         'button_text' => 'Donner mon avis',
         'submit_label' => 'Envoyer ma réponse',
         'thanks' => 'Merci, votre réponse a bien été enregistrée.',
-        'show_bar' => true,          // bandeau de couleur en haut de la page du formulaire
+        'show_bar' => false,         // bandeau de couleur en haut de la page (retiré par défaut)
         'accent_color' => '#ff7900', // couleur du bandeau, du badge et des champs actifs
         'fields' => [],
     ];

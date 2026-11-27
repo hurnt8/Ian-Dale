@@ -53,7 +53,7 @@ class ResponseController extends Controller
     private function templatesWithResponses(User $user)
     {
         return MessageTemplate::query()
-            ->whereHas('campaigns', fn (Builder $c) => $c->whereNotNull('form')->when(! $user->isAdmin(), fn (Builder $q) => $q->where('user_id', $user->id)))
+            ->whereHas('campaigns', fn (Builder $c) => $c->whereNotNull('campaigns.form')->when(! $user->isAdmin(), fn (Builder $q) => $q->where('campaigns.user_id', $user->id)))
             ->orderBy('name')
             ->get(['id', 'name']);
     }

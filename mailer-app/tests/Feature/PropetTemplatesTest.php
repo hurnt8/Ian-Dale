@@ -43,15 +43,21 @@ class PropetTemplatesTest extends TestCase
     {
         $propet = User::factory()->create();
 
-        // Par défaut : bandeau orange conservé
+        // Par défaut : plus de bandeau orange
         $this->actingAs($propet)->post(route('propet.templates.store'), $this->payload());
         $template = MessageTemplate::firstOrFail();
         $this->actingAs($propet)->get(route('preview.form', $template))->assertOk()
-            ->assertSee('class="pub-bar"', false)->assertSee('--pub-accent: #ff7900', false);
+            ->assertDontSee('class="pub-bar"', false);
 
-        // Sans bandeau, autre couleur
+        // Bandeau réactivé, dans une autre couleur
         $payload = $this->payload();
-        $payload['form'] += ['show_bar' => '0', 'accent_color' => '#1E88E5'];
+        $payload['form'] += ['show_bar' => '1', 'accent_color' => '#1E88E5'];
+        $this->actingAs($propet)->put(route('propet.templates.update', $template), $payload);
+        $this->actingAs($propet)->get(route('preview.form', $template))->assertOk()
+            ->assertSee('class="pub-bar"', false)->assertSee('--pub-accent: #1e88e5', false);
+
+        // Décoché : retiré
+        $payload['form']['show_bar'] = '0';
         $this->actingAs($propet)->put(route('propet.templates.update', $template), $payload);
         $this->actingAs($propet)->get(route('preview.form', $template))->assertOk()
             ->assertDontSee('class="pub-bar"', false)->assertSee('--pub-accent: #1e88e5', false);
