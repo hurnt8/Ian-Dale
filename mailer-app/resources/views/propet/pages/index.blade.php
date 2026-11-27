@@ -1,19 +1,19 @@
 @extends('layouts.app')
 @section('title', 'Vues')
-@section('subtitle')<span class="subtitle">Pages publiques qui vous sont attribuées et leurs réponses.</span>@endsection
+@section('subtitle')<span class="subtitle">Partagez votre lien personnel : les réponses reçues par ce lien vous reviennent.</span>@endsection
 
 @section('content')
 <div class="card">
     <div class="table-responsive">
         <table class="table table-hover align-middle">
-            <thead><tr><th>Vue</th><th>Adresse publique</th><th>Réponses</th><th></th></tr></thead>
+            <thead><tr><th>Vue</th><th style="min-width: 340px">Mon lien personnel</th><th>Mes réponses</th><th></th></tr></thead>
             <tbody>
             @forelse($pages as $page)
                 <tr>
                     <td class="fw-semibold">{{ $page->title() }}</td>
-                    <td class="email-cell">
+                    <td>
                         @if($page->is_published)
-                            <a href="{{ route('page.show', $page->slug) }}" target="_blank" class="text-decoration-none">/vue/{{ $page->slug }} <i class="bi bi-box-arrow-up-right small"></i></a>
+                            @include('propet.pages._share', ['url' => $page->linkFor(auth()->user())])
                         @else
                             <span class="pill tone-gray">Brouillon</span>
                         @endif
@@ -24,7 +24,7 @@
                     </td>
                 </tr>
             @empty
-                <tr><td colspan="4" class="empty"><i class="bi bi-window"></i>Aucune vue ne vous est attribuée pour l'instant.</td></tr>
+                <tr><td colspan="4" class="empty"><i class="bi bi-window"></i>Aucune vue publiée pour l'instant.</td></tr>
             @endforelse
             </tbody>
         </table>

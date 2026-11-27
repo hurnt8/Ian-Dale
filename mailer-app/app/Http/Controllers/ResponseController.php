@@ -67,7 +67,7 @@ class ResponseController extends Controller
     private function pageResponses(User $user)
     {
         return PageResponse::query()
-            ->when(! $user->isAdmin(), fn (Builder $q) => $q->whereHas('page.agents', fn (Builder $a) => $a->whereKey($user->id)))
+            ->visibleTo($user) // agent : réponses de son lien + lien général des vues attribuées
             ->with('page')
             ->latest()
             ->limit(30)

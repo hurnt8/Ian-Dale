@@ -32,6 +32,18 @@ class Page extends Model
         return $this->belongsToMany(User::class);
     }
 
+    /** Lien personnel de l'agent : les réponses reçues par ce lien lui reviennent. */
+    public function linkFor(User $agent): string
+    {
+        return route('page.show', ['slug' => $this->slug, \App\Support\AgentLink::PARAM => \App\Support\AgentLink::code($agent)]);
+    }
+
+    /** Vues qu'un agent peut partager avec son lien : celles que l'admin lui a attribuées. */
+    public function scopeForAgent(Builder $query, User $agent): Builder
+    {
+        return $query->whereIn('pages.id', $agent->assignedPages()->select('pages.id'));
+    }
+
     public function hasForm(): bool
     {
         return ResponseForm::isActive($this->form);

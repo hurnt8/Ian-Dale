@@ -70,7 +70,7 @@ class PageController extends Controller
     {
         return view('admin.pages.responses', [
             'page' => $page,
-            'responses' => $page->responses()->latest()->paginate(40),
+            'responses' => $page->responses()->with('agent:id,name')->latest()->paginate(40),
         ]);
     }
 

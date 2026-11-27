@@ -4,7 +4,6 @@
 <body class="pub">
     <div class="pub-wrap" style="max-width: 440px">
         <div class="pub-card">
-            <div class="pub-bar"></div>
             <div class="pub-logo">
                 <a href="{{ url('/') }}" class="brand p-0 d-inline-flex" style="color:var(--pub-ink)">
                     <span class="brand-logo"><i class="bi bi-envelope-paper-fill"></i></span>{{ config('app.name') }}
