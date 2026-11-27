@@ -10,7 +10,7 @@ use Illuminate\Validation\Rule;
  *
  * Structure stockée (JSON) :
  * {
- *   enabled, title, intro, button_text, submit_label, thanks,
+ *   enabled, title, intro, button_text, submit_label, thanks, show_bar, accent_color,
  *   fields: [{key, label, type, required, placeholder, options: []}]
  * }
  */
@@ -39,6 +39,8 @@ final class ResponseForm
         'button_text' => 'Donner mon avis',
         'submit_label' => 'Envoyer ma réponse',
         'thanks' => 'Merci, votre réponse a bien été enregistrée.',
+        'show_bar' => true,          // bandeau de couleur en haut de la page du formulaire
+        'accent_color' => '#ff7900', // couleur du bandeau, du badge et des champs actifs
         'fields' => [],
     ];
 
@@ -58,6 +60,8 @@ final class ResponseForm
             'button_text' => self::str($input['button_text'] ?? null, 60) ?: self::DEFAULTS['button_text'],
             'submit_label' => self::str($input['submit_label'] ?? null, 60) ?: self::DEFAULTS['submit_label'],
             'thanks' => self::str($input['thanks'] ?? null, 500) ?: self::DEFAULTS['thanks'],
+            'show_bar' => array_key_exists('show_bar', $input) ? (bool) $input['show_bar'] : self::DEFAULTS['show_bar'],
+            'accent_color' => self::color($input['accent_color'] ?? null),
             'fields' => [],
         ];
 
@@ -105,6 +109,12 @@ final class ResponseForm
         }
 
         return $form;
+    }
+
+    /** Couleur hexadécimale #rrggbb, sinon la couleur par défaut. */
+    public static function color(mixed $value): string
+    {
+        return is_string($value) && preg_match('/^#[0-9a-fA-F]{6}$/', $value) ? strtolower($value) : self::DEFAULTS['accent_color'];
     }
 
     /** @param array<string,mixed>|null $form */

@@ -39,6 +39,29 @@ class PropetTemplatesTest extends TestCase
         $this->assertContains($template->id, $propet->availableTemplates()->pluck('id')->all());
     }
 
+    public function test_propet_can_remove_orange_bar_or_change_its_color(): void
+    {
+        $propet = User::factory()->create();
+
+        // Par défaut : bandeau orange conservé
+        $this->actingAs($propet)->post(route('propet.templates.store'), $this->payload());
+        $template = MessageTemplate::firstOrFail();
+        $this->actingAs($propet)->get(route('preview.form', $template))->assertOk()
+            ->assertSee('class="pub-bar"', false)->assertSee('--pub-accent: #ff7900', false);
+
+        // Sans bandeau, autre couleur
+        $payload = $this->payload();
+        $payload['form'] += ['show_bar' => '0', 'accent_color' => '#1E88E5'];
+        $this->actingAs($propet)->put(route('propet.templates.update', $template), $payload);
+        $this->actingAs($propet)->get(route('preview.form', $template))->assertOk()
+            ->assertDontSee('class="pub-bar"', false)->assertSee('--pub-accent: #1e88e5', false);
+
+        // Couleur invalide : retour à l'orange
+        $payload['form']['accent_color'] = 'red;}body{display:none';
+        $this->actingAs($propet)->put(route('propet.templates.update', $template), $payload);
+        $this->assertSame('#ff7900', $template->fresh()->form['accent_color']);
+    }
+
     public function test_personal_messages_stay_private_to_their_author(): void
     {
         MessageTemplate::create(['name' => 'Partagé', 'subject' => 's', 'body' => 'b', 'is_active' => true]);
