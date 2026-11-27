@@ -241,10 +241,10 @@ textarea.emails { font-family: ui-monospace, Consolas, monospace; font-size: .85
 
 /* ========================================================================
    Thème public « carte centrée » — formulaire de réponse, vues et connexion
-   (bandeau orange, carte blanche, gros titre, bouton foncé)
+   (carte blanche, gros titre, bouton foncé)
    ======================================================================== */
 :root {
-    --pub-accent: #ff7900;        /* orange officiel Orange — bandeau + focus + liens */
+    --pub-accent: #ff7900;        /* couleur des champs actifs, du badge et des choix */
     --pub-btn: #000000;          /* bouton principal noir, comme « Continuer » */
     --pub-btn-hover: #333333;
     --pub-field: #f4f4f4;        /* fond des champs */
@@ -261,7 +261,7 @@ body.pub {
 }
 .pub-wrap { width: 100%; max-width: 560px; margin: 0 auto; padding: 44px 16px 64px; flex: 1; }
 .pub-card { background: #fff; border: 1px solid #e3e3e3; border-radius: 4px; box-shadow: 0 1px 3px rgba(16,24,40,.06); overflow: hidden; }
-.pub-bar { height: 10px; background: var(--pub-accent); }
+.pub-bar { display: none !important; } /* bandeau orange supprimé */
 .pub-logo { text-align: center; padding: 34px 32px 0; }
 .pub-logo img { max-width: 160px; max-height: 70px; }
 .pub-logo.left { text-align: left; } .pub-logo.right { text-align: right; }

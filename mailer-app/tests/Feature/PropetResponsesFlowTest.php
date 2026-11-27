@@ -46,6 +46,7 @@ class PropetResponsesFlowTest extends TestCase
 
         $this->actingAs($propet)->get(route('propet.responses.index'))->assertOk()->assertSee('Bonjour, je suis très satisfait');
         $this->actingAs($propet)->get(route('propet.responses.index', ['campaign' => $campaign->id]))->assertOk()->assertSee('Bonjour, je suis très satisfait');
-        $this->actingAs($propet)->get(route('propet.campaigns.show', $campaign))->assertOk()->assertSee('Répondu');
+        $this->actingAs($propet)->get(route('propet.campaigns.show', $campaign))->assertOk()->assertSee('Répondu')
+            ->assertSee('Réponses des clients')->assertSee('Bonjour, je suis très satisfait')->assertSee('Votre message');
     }
 }

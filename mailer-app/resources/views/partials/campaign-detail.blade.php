@@ -15,7 +15,7 @@
                 <div class="fw-semibold">Formulaire « {{ $campaign->form['title'] }} »</div>
                 <div class="small text-secondary">{{ $responsesCount }} réponse(s) sur {{ $stats['sent'] }} email(s) envoyé(s)</div>
             </div>
-            <a href="{{ route($responsesRoute, ['campaign' => $campaign->id]) }}" class="btn btn-primary"><i class="bi bi-eye me-1"></i> Voir les réponses</a>
+            <a href="#reponses" class="btn btn-primary"><i class="bi bi-eye me-1"></i> Voir les réponses</a>
         </div>
     </div>
 @endif
@@ -95,3 +95,34 @@
         </div>
     </div>
 </div>
+
+@if($hasForm && isset($responses))
+    <div class="card mt-4" id="reponses">
+        <div class="card-header">
+            <span><i class="bi bi-chat-left-quote me-2"></i>Réponses des clients <span class="text-secondary fw-normal">({{ $responses->total() }})</span></span>
+            @if($responses->total())
+                <a href="{{ route($responsesRoute, ['campaign' => $campaign->id]) }}" class="small fw-normal text-decoration-none">Synthèse et export CSV <i class="bi bi-arrow-right"></i></a>
+            @endif
+        </div>
+        @forelse($responses as $resp)
+            <div class="card-body border-bottom py-3">
+                <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                    <span class="d-flex align-items-center gap-2 overflow-hidden">
+                        <span class="avatar" style="width:28px;height:28px;font-size:.72rem">{{ mb_strtoupper(mb_substr($resp->email, 0, 1)) }}</span>
+                        <span class="email-cell text-truncate fw-semibold">{{ $resp->email }}</span>
+                    </span>
+                    <span class="small text-secondary text-nowrap">
+                        {{ $resp->updated_at->format('d/m/Y H:i') }}
+                        @if($resp->edits > 0)<span class="pill tone-gray ms-1">modifiée</span>@endif
+                    </span>
+                </div>
+                @include('partials.response-answers', ['answers' => $resp->answers])
+            </div>
+        @empty
+            <div class="empty"><i class="bi bi-inbox"></i>Aucune réponse pour le moment.
+                <div class="small mt-2">Les réponses des clients s'afficheront ici dès qu'ils rempliront le formulaire depuis l'email.</div>
+            </div>
+        @endforelse
+    </div>
+    @if($responses->hasPages())<div class="mt-3">{{ $responses->fragment('reponses')->links() }}</div>@endif
+@endif

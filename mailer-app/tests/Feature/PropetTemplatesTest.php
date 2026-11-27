@@ -39,28 +39,18 @@ class PropetTemplatesTest extends TestCase
         $this->assertContains($template->id, $propet->availableTemplates()->pluck('id')->all());
     }
 
-    public function test_propet_can_remove_orange_bar_or_change_its_color(): void
+    public function test_no_orange_bar_and_propet_can_change_color(): void
     {
         $propet = User::factory()->create();
 
-        // Par défaut : plus de bandeau orange
-        $this->actingAs($propet)->post(route('propet.templates.store'), $this->payload());
-        $template = MessageTemplate::firstOrFail();
-        $this->actingAs($propet)->get(route('preview.form', $template))->assertOk()
-            ->assertDontSee('class="pub-bar"', false);
-
-        // Bandeau réactivé, dans une autre couleur
+        // Plus jamais de bandeau en haut, même si on tente de l'activer
         $payload = $this->payload();
         $payload['form'] += ['show_bar' => '1', 'accent_color' => '#1E88E5'];
-        $this->actingAs($propet)->put(route('propet.templates.update', $template), $payload);
+        $this->actingAs($propet)->post(route('propet.templates.store'), $payload);
+        $template = MessageTemplate::firstOrFail();
         $this->actingAs($propet)->get(route('preview.form', $template))->assertOk()
-            ->assertSee('class="pub-bar"', false)->assertSee('--pub-accent: #1e88e5', false);
-
-        // Décoché : retiré
-        $payload['form']['show_bar'] = '0';
-        $this->actingAs($propet)->put(route('propet.templates.update', $template), $payload);
-        $this->actingAs($propet)->get(route('preview.form', $template))->assertOk()
-            ->assertDontSee('class="pub-bar"', false)->assertSee('--pub-accent: #1e88e5', false);
+            ->assertDontSee('pub-bar', false)->assertSee('--pub-accent: #1e88e5', false);
+        $this->get('/login')->assertDontSee('pub-bar', false);
 
         // Couleur invalide : retour à l'orange
         $payload['form']['accent_color'] = 'red;}body{display:none';

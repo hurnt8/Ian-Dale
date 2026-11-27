@@ -89,6 +89,8 @@ class CampaignController extends Controller
             'campaign' => $campaign,
             'stats' => $campaign->stats(),
             'recipients' => $campaign->recipients()->with('response:id,campaign_recipient_id,updated_at')->orderBy('id')->paginate(50),
+            // Réponses complètes des clients, affichées directement dans la page de la liste
+            'responses' => $campaign->responses()->latest('updated_at')->paginate(10, ['*'], 'reponses'),
         ]);
     }
 }

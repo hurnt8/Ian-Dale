@@ -110,15 +110,8 @@
                             <label class="form-label">Message affiché après l'envoi</label>
                             <input name="form[thanks]" value="{{ $f['thanks'] }}" maxlength="500" class="form-control">
                         </div>
-                        <div class="col-md-6 d-flex align-items-center">
-                            <div class="form-check form-switch mb-0">
-                                <input type="hidden" name="form[show_bar]" value="0">
-                                <input type="checkbox" name="form[show_bar]" value="1" class="form-check-input" id="form_show_bar" @checked($f['show_bar'])>
-                                <label class="form-check-label" for="form_show_bar">Afficher le bandeau de couleur en haut</label>
-                            </div>
-                        </div>
                         <div class="col-md-6">
-                            <label class="form-label" for="form_accent_color">Couleur du bandeau et des champs</label>
+                            <label class="form-label" for="form_accent_color">Couleur des champs et des choix</label>
                             <div class="d-flex gap-2 align-items-center">
                                 <input type="color" name="form[accent_color]" id="form_accent_color" value="{{ \App\Support\ResponseForm::color($f['accent_color']) }}" class="form-control form-control-color">
                                 <button type="button" class="btn btn-light btn-sm" onclick="document.getElementById('form_accent_color').value='#ff7900'">Orange par défaut</button>
