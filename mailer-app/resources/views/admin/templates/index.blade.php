@@ -18,6 +18,7 @@
                         <span class="text-truncate">{{ $t->name }}</span>
                     </span>
                     <span class="d-flex gap-1">
+                        @if($t->isPersonal())<span class="pill tone-gray" title="Message personnel créé par cet agent">{{ $t->owner?->name ?? 'Agent' }}</span>@endif
                         @if($t->is_default)<span class="pill tone-indigo">Recommandé</span>@endif
                         <span class="pill {{ $t->is_active ? 'tone-green' : 'tone-gray' }}">{{ $t->is_active ? 'Actif' : 'Inactif' }}</span>
                     </span>

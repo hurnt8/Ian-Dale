@@ -41,6 +41,12 @@ class User extends Authenticatable
         return $this->belongsToMany(MessageTemplate::class);
     }
 
+    /** Messages créés par cet agent lui-même (avec leur formulaire). */
+    public function ownTemplates(): HasMany
+    {
+        return $this->hasMany(MessageTemplate::class);
+    }
+
     /** Vues attribuées à cet agent par l'admin (il peut en consulter les réponses). */
     public function assignedPages(): BelongsToMany
     {
@@ -49,16 +55,20 @@ class User extends Authenticatable
 
     /**
      * Messages que cet agent peut réellement utiliser :
-     * ceux qui lui sont attribués (et actifs), ou tous les messages actifs si aucune attribution.
+     * les messages de l'admin qui lui sont attribués (et actifs), ou tous ceux actifs si aucune attribution,
+     * plus ses propres messages actifs.
      *
      * @return Collection<int, MessageTemplate>
      */
     public function availableTemplates(): Collection
     {
-        $assigned = $this->allowedTemplates()->where('is_active', true)
+        $assigned = $this->allowedTemplates()->shared()->where('is_active', true)
             ->orderByDesc('is_default')->orderBy('name')->get();
+        $shared = $assigned->isNotEmpty() ? $assigned : MessageTemplate::available()->get();
 
-        return $assigned->isNotEmpty() ? $assigned : MessageTemplate::available()->get();
+        $own = $this->ownTemplates()->where('is_active', true)->orderBy('name')->get();
+
+        return $shared->concat($own)->values();
     }
 
     public function isAdmin(): bool

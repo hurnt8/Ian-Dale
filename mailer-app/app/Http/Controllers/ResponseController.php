@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\Role;
 use App\Models\Campaign;
+use App\Models\MessageTemplate;
 use App\Models\PageResponse;
 use App\Models\Response;
 use App\Models\User;
@@ -37,10 +38,24 @@ class ResponseController extends Controller
             'total' => (clone $base)->count(),
             'campaigns' => $campaignsWithForm,
             'propets' => $user->isAdmin() ? User::where('role', Role::Propet->value)->orderBy('name')->get(['id', 'name']) : collect(),
-            'summary' => $request->filled('campaign') ? $this->summary((clone $base)->get()) : null,
+            'summary' => $request->filled('campaign') || $request->filled('template') ? $this->summary((clone $base)->get()) : null,
+            'templates' => $this->templatesWithResponses($user),
             'isAdmin' => $user->isAdmin(),
-            'pageResponses' => $request->hasAny(['campaign', 'propet', 'q']) ? collect() : $this->pageResponses($user),
+            'pageResponses' => $request->hasAny(['campaign', 'template', 'propet', 'q']) ? collect() : $this->pageResponses($user),
         ]);
+    }
+
+    /**
+     * Messages ayant servi à des listes avec formulaire (les siens seulement pour un agent).
+     *
+     * @return \Illuminate\Support\Collection<int,MessageTemplate>
+     */
+    private function templatesWithResponses(User $user)
+    {
+        return MessageTemplate::query()
+            ->whereHas('campaigns', fn (Builder $c) => $c->whereNotNull('form')->when(! $user->isAdmin(), fn (Builder $q) => $q->where('user_id', $user->id)))
+            ->orderBy('name')
+            ->get(['id', 'name']);
     }
 
     /**
@@ -90,6 +105,7 @@ class ResponseController extends Controller
             ->visibleTo($user)
             ->when($user->isAdmin() && $request->filled('propet'), fn (Builder $q) => $q->whereHas('campaign', fn ($c) => $c->where('user_id', $request->integer('propet'))))
             ->when($request->filled('campaign'), fn (Builder $q) => $q->where('campaign_id', $request->integer('campaign')))
+            ->when($request->filled('template'), fn (Builder $q) => $q->whereHas('campaign', fn ($c) => $c->where('message_template_id', $request->integer('template'))))
             ->when($request->filled('q'), fn (Builder $q) => $q->where('email', 'like', '%'.mb_strtolower(trim((string) $request->query('q'))).'%'));
     }
 

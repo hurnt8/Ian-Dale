@@ -15,7 +15,7 @@ class PreviewController extends Controller
     public function template(Request $request, MessageTemplate $template): Response
     {
         $user = $request->user();
-        abort_unless($user->isAdmin() || $template->is_active, 404);
+        abort_unless($template->isVisibleTo($user), 404);
 
         // Seul l'admin peut prévisualiser des réglages de présentation non enregistrés
         $overrides = $user->isAdmin() ? $request->query() : [];
@@ -33,7 +33,7 @@ class PreviewController extends Controller
     /** Aperçu du formulaire tel que le verra le destinataire (aucune réponse enregistrée). */
     public function form(Request $request, MessageTemplate $template): \Illuminate\View\View
     {
-        abort_unless($request->user()->isAdmin() || $template->is_active, 404);
+        abort_unless($template->isVisibleTo($request->user()), 404);
         abort_unless($template->hasForm(), 404);
 
         $b = \App\Support\MailBranding::current();

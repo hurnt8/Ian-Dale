@@ -102,6 +102,8 @@ class UserController extends Controller
             return back()->with('error', 'Vous ne pouvez pas supprimer votre propre compte.');
         }
 
+        // Ses messages personnels deviendraient partagés : on les désactive avant que l'admin ne décide.
+        $user->ownTemplates()->update(['is_active' => false]);
         $user->delete();
 
         return back()->with('success', 'Utilisateur supprimé.');

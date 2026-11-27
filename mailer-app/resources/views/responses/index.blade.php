@@ -24,6 +24,14 @@
                     @endforeach
                 </select>
             @endif
+            @if($templates->isNotEmpty())
+                <select name="template" class="form-select" onchange="this.form.submit()">
+                    <option value="">Tous les messages</option>
+                    @foreach($templates as $t)
+                        <option value="{{ $t->id }}" @selected((string) request('template') === (string) $t->id)>{{ $t->name }}</option>
+                    @endforeach
+                </select>
+            @endif
             <select name="campaign" class="form-select" onchange="this.form.submit()">
                 <option value="">Toutes les listes</option>
                 @foreach($campaigns as $c)
@@ -31,7 +39,7 @@
                 @endforeach
             </select>
             <button class="btn btn-primary"><i class="bi bi-funnel"></i> Filtrer</button>
-            @if(request()->hasAny(['q', 'propet', 'campaign']))
+            @if(request()->hasAny(['q', 'propet', 'campaign', 'template']))
                 <a href="{{ route($prefix.'.responses.index') }}" class="btn btn-link text-secondary">Réinitialiser</a>
             @endif
         </form>
@@ -39,11 +47,13 @@
 </div>
 
 @if($summary)
-    @php($current = $campaigns->firstWhere('id', (int) request('campaign')))
+    @php($current = request()->filled('campaign') ? $campaigns->firstWhere('id', (int) request('campaign')) : null)
     <div class="row g-3 mb-4">
+        @if($current)
         <div class="col-md-4 col-xl-3">
             @include('partials.stat-card', ['label' => 'Taux de réponse', 'value' => $current && $current->sent_count ? round($current->responses_count * 100 / $current->sent_count) : 0, 'icon' => 'bi-percent', 'tone' => 'indigo'])
         </div>
+        @endif
         @foreach($summary as $s)
             @if(isset($s['average']) || ! empty($s['distribution']))
                 <div class="col-md-4 col-xl-3">

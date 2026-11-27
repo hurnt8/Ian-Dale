@@ -1,20 +1,24 @@
 @extends('layouts.app')
+@php
+    $prefix ??= 'admin';
+    $isAdminSpace = $prefix === 'admin';
+@endphp
 @section('title', $template->exists ? 'Modifier le message' : 'Nouveau message')
 @section('subtitle')
-    <a href="{{ route('admin.templates.index') }}" class="text-decoration-none"><i class="bi bi-arrow-left"></i> Messages</a>
+    <a href="{{ route($prefix.'.templates.index') }}" class="text-decoration-none"><i class="bi bi-arrow-left"></i> Messages</a>
 @endsection
 
 @section('content')
 <div class="row g-4">
     <div class="col-xl-7">
-        <form method="POST" enctype="multipart/form-data" action="{{ $template->exists ? route('admin.templates.update', $template) : route('admin.templates.store') }}">
+        <form method="POST" enctype="multipart/form-data" action="{{ $template->exists ? route($prefix.'.templates.update', $template) : route($prefix.'.templates.store') }}">
             @csrf
             @if($template->exists) @method('PUT') @endif
 
             <div class="card mb-4"><div class="card-body">
                 <div class="row g-3">
                     <div class="col-md-5">
-                        <label class="form-label">Nom (visible par les propets)</label>
+                        <label class="form-label">{{ $isAdminSpace ? 'Nom (visible par les propets)' : 'Nom du message' }}</label>
                         <input name="name" value="{{ old('name', $template->name) }}" class="form-control" required>
                     </div>
                     <div class="col-md-7">
@@ -147,6 +151,7 @@
             </template>
 
             <div class="card mb-4"><div class="card-body">
+                @if($isAdminSpace && ! $template->isPersonal())
                 <div class="form-check form-switch mb-2">
                     <input type="checkbox" name="is_active" value="1" class="form-check-input" id="is_active" @checked(old('is_active', $template->is_active))>
                     <label class="form-check-label" for="is_active"><span class="fw-semibold">Disponible pour les propets</span> <span class="text-secondary small">— ils pourront le choisir lors de l'envoi d'une liste</span></label>
@@ -155,11 +160,17 @@
                     <input type="checkbox" name="is_default" value="1" class="form-check-input" id="is_default" @checked(old('is_default', $template->is_default))>
                     <label class="form-check-label" for="is_default"><span class="fw-semibold">Message recommandé</span> <span class="text-secondary small">— présélectionné pour les propets</span></label>
                 </div>
+                @else
+                <div class="form-check form-switch">
+                    <input type="checkbox" name="is_active" value="1" class="form-check-input" id="is_active" @checked(old('is_active', $template->is_active))>
+                    <label class="form-check-label" for="is_active"><span class="fw-semibold">Actif</span> <span class="text-secondary small">— {{ $isAdminSpace ? 'message personnel de '.($template->owner?->name ?? 'un agent').', utilisable par cet agent seulement' : "vous pourrez le choisir lors de l'envoi d'une liste" }}</span></label>
+                </div>
+                @endif
             </div></div>
 
             <div class="d-flex gap-2">
                 <button class="btn btn-primary"><i class="bi bi-check2 me-1"></i> Enregistrer</button>
-                <a href="{{ route('admin.templates.index') }}" class="btn btn-light">Annuler</a>
+                <a href="{{ route($prefix.'.templates.index') }}" class="btn btn-light">Annuler</a>
             </div>
         </form>
 
@@ -224,7 +235,7 @@
         <div class="card position-sticky" style="top: 16px">
             <div class="card-header">
                 <span><i class="bi bi-eye me-2"></i>Aperçu</span>
-                <a href="{{ route('admin.presentation.edit') }}" class="small fw-normal text-decoration-none">Modifier la présentation</a>
+                @if($isAdminSpace)<a href="{{ route('admin.presentation.edit') }}" class="small fw-normal text-decoration-none">Modifier la présentation</a>@endif
             </div>
             <div class="card-body p-2">
                 @if($template->exists)

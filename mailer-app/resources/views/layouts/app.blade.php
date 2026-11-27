@@ -38,6 +38,7 @@
             <div class="nav-section">Mon espace</div>
             <a href="{{ route('propet.campaigns.create') }}" class="{{ $link('', 'propet.campaigns.create') }}"><i class="bi bi-plus-circle"></i> Nouvelle liste</a>
             <a href="{{ route('propet.campaigns.index') }}" class="{{ request()->routeIs('propet.campaigns.index', 'propet.campaigns.show') ? 'side-link active' : 'side-link' }}"><i class="bi bi-collection"></i> Mes listes</a>
+            <a href="{{ route('propet.templates.index') }}" class="{{ $link('', 'propet.templates.*') }}"><i class="bi bi-chat-square-text"></i> Mes messages</a>
             <a href="{{ route('propet.emails.index') }}" class="{{ $link('', 'propet.emails.*') }}"><i class="bi bi-envelope-at"></i> Mes emails</a>
             <a href="{{ route('propet.responses.index') }}" class="{{ $link('', 'propet.responses.*') }}"><i class="bi bi-chat-left-quote"></i> Réponses reçues</a>
             <a href="{{ route('propet.pages.index') }}" class="{{ $link('', 'propet.pages.*') }}"><i class="bi bi-window"></i> Vues</a>
